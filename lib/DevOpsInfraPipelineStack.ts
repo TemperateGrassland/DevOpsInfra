@@ -27,10 +27,25 @@ export class DevOpsInfraPipelineStack extends Stack {
             }),
         });
 
-        // This is where we add the application stages
-        // ...
-        pipeline.addStage(new DevOpsInfraStage(this, 'PreProd', {
+
+        const preprod = new DevOpsInfraStage(this, 'PreProd', {
             env: { account: '451883816125', region: 'eu-west-2' }
-        }));
+        });
+        const preprodStage = pipeline.addStage(preprod, {
+            post: [
+                new ShellStep('TestService', {
+                    commands: [
+                        // Use 'curl' to GET the given URL and fail if it returns an error
+                        'curl -Ssf $ENDPOINT_URL',
+                    ],
+                    envFromCfnOutputs: {
+                        // Get the stack Output from the Stage and make it available in
+                        // the shell script as $ENDPOINT_URL.
+                        ENDPOINT_URL: preprod.urlOutput,
+                    },
+                }),
+
+            ],
+        });
     }
 }
