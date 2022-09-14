@@ -1,5 +1,6 @@
 import { Construct, SecretValue, Stack, StackProps } from '@aws-cdk/core';
 import { CodePipeline, CodePipelineSource, ShellStep } from "@aws-cdk/pipelines";
+import {DevOpsInfraStage} from "./DevOpsInfraStage";
 
 /**
  * The stack that defines the application pipeline
@@ -28,5 +29,8 @@ export class DevOpsInfraPipelineStack extends Stack {
 
         // This is where we add the application stages
         // ...
+        pipeline.addStage(new DevOpsInfraStage(this, 'PreProd', {
+            env: { account: '451883816125', region: 'eu-west-2' }
+        }));
     }
 }
